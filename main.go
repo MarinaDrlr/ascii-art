@@ -7,41 +7,41 @@ import (
 )
 
 func main() {
-	// Get user input and font choice
-	input, font, err := funcs.GetInput()
+	// Get user input (only one argument is expected)
+	input, err := funcs.GetInput()
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
+		fmt.Fprintln(os.Stderr, "Error:", err)
 		os.Exit(1)
 	}
 
 	// Normalize the input to match the banner map keys
 	normalizedInput := funcs.NormalizeInput(input)
 
-	// Check if the normalized input is empty
+	// Exit silently if input is empty after normalization
 	if normalizedInput == "" {
-		return // Simply exit without printing anything
+		return
 	}
 
-	// Load the banner file dynamically
-	banner, err := funcs.LoadBanner(font)
+	// Load the standard banner font file
+	banner, err := funcs.LoadBanner()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Error:", err)
 		os.Exit(1)
 	}
 
-	// Generate ASCII art
+	// Generate ASCII art from the input
 	asciiArt, err := funcs.GenerateASCIIArt(normalizedInput, banner)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Error:", err)
 		os.Exit(1)
 	}
 
-	// If ASCII art is empty but input was just newlines, print a blank line
+	// Print a blank line if input was only newlines
 	if len(asciiArt) == 0 {
-		fmt.Println() // Prints a blank line
+		fmt.Println()
 		return
 	}
 
-	// Print the generated ASCII art to the console
+	// Display the ASCII art to the terminal
 	funcs.DisplayASCIIArt(asciiArt)
 }

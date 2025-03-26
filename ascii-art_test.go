@@ -8,8 +8,8 @@ import (
 // TestNormalizeInput checks if NormalizeInput correctly replaces `\n` (literal backslash + n) with actual newlines
 func TestNormalizeInput(t *testing.T) {
 	tests := []struct {
-		input    string // Input string to be tested
-		expected string // Expected output after normalization
+		input    string
+		expected string
 	}{
 		{`Hello\nWorld`, "Hello\nWorld"},
 		{`Line1\nLine2\nLine3`, "Line1\nLine2\nLine3"},
@@ -34,76 +34,54 @@ func TestNormalizeInputNewlines(t *testing.T) {
 	}
 }
 
-// TestLoadBanner ensures that the banner font is loaded correctly and is not empty
+// TestLoadBanner ensures that the standard banner is loaded correctly and is not empty
 func TestLoadBanner(t *testing.T) {
-	banner, err := funcs.LoadBanner("standard")
+	banner, err := funcs.LoadBanner()
 	if err != nil {
 		t.Errorf("LoadBanner failed: %v", err)
 	}
 
-	// The banner map should not be empty if the font loaded successfully
 	if len(banner) == 0 {
-		t.Errorf("LoadBanner failed: expected non-empty banner map")
+		t.Errorf("Expected non-empty banner map")
 	}
 }
 
-// TestLoadCorruptedBanner checks that an error is returned
-// when trying to load a corrupted or incomplete banner file
-func TestLoadCorruptedBanner(t *testing.T) {
-	// "broken.txt" should be a corrupted banner file in the "fonts" directory
-	_, err := funcs.LoadBanner("broken")
-	if err == nil {
-		t.Errorf("Expected error when loading corrupted banner, got nil")
-	}
-}
-
-// TestGenerateASCIIArt verifies that ASCII art is generated correctly for different inputs
+// TestGenerateASCIIArt verifies that ASCII art is generated correctly for various inputs
 func TestGenerateASCIIArt(t *testing.T) {
-	// Load the standard font banner for testing
-	banner, err := funcs.LoadBanner("standard")
+	banner, err := funcs.LoadBanner()
 	if err != nil {
-		t.Errorf("LoadBanner failed: %v", err)
+		t.Fatalf("Failed to load banner: %v", err)
 	}
 
 	tests := []struct {
-		input    string // Input text to convert to ASCII art
-		expected int    // Expected number of lines in the ASCII output
+		input    string
+		expected int
 	}{
-		{"A", 8},             // A single character should have 8 lines
-		{"Hello", 8},         // A word should also be 8 lines tall
-		{"Hello\nWorld", 16}, // Two lines should result in 16 total lines
+		{"A", 8},
+		{"Hello", 8},
+		{"Hello\nWorld", 16},
 	}
 
 	for _, test := range tests {
 		result, err := funcs.GenerateASCIIArt(test.input, banner)
 		if err != nil {
-			t.Errorf("GenerateASCIIArt failed for input %q: %v", test.input, err)
+			t.Errorf("GenerateASCIIArt(%q) failed: %v", test.input, err)
 		}
-
-		// Ensure the number of lines in the result matches the expected value
 		if len(result) != test.expected {
-			t.Errorf("GenerateASCIIArt(%q) returned %d lines; want %d", test.input, len(result), test.expected)
+			t.Errorf("Expected %d lines, got %d", test.expected, len(result))
 		}
 	}
 }
 
-// TestGenerateASCIIArtUnsupportedChar checks that an error is returned
-// when the input contains a character not found in the banner map
+// TestGenerateASCIIArtUnsupportedChar checks error handling for unsupported characters
 func TestGenerateASCIIArtUnsupportedChar(t *testing.T) {
-	// Load the standard banner
-	banner, err := funcs.LoadBanner("standard")
+	banner, err := funcs.LoadBanner()
 	if err != nil {
 		t.Fatalf("Failed to load banner: %v", err)
 	}
 
-	// Input contains a non-ASCII character (emoji)
 	_, err = funcs.GenerateASCIIArt("Hello 🌍", banner)
 	if err == nil {
 		t.Errorf("Expected error for unsupported character, got nil")
 	}
 }
-
-// // TestDEBUGCheck forces a failure to ensure tests are running
-// func TestDEBUGCheck(t *testing.T) {
-// 	t.Fail() // This will make the test fail on purpose
-// }

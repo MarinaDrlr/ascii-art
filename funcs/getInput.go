@@ -5,22 +5,22 @@ import (
 	"os"
 )
 
-// GetInput retrieves the user's input text and the chosen font (or defaults to "standard").
-// It expects 1 or 2 arguments (excluding flags). If the argument count is invalid, it returns an error.
-func GetInput() (string, string, error) {
+// GetInput retrieves the user's input text.
+// It expects exactly 1 argument: the string to convert to ASCII art.
+// If no argument is provided, or too many arguments are given, it returns an error.
+func GetInput() (string, error) {
 	args := os.Args[1:] // Skip the program name
 
-	// Validate the number of non-flag arguments
-	if len(args) == 0 || len(args) > 2 {
-		return "", "", fmt.Errorf("Usage: go run . [STRING] [BANNER]\nEX: go run . something standard")
+	if len(args) == 0 {
+		// No input provided
+		return "", fmt.Errorf("No input was given.\nUsage: go run . [STRING]\nEX: go run . \"something\"")
 	}
 
-	input := args[0]   // Required: the text to convert to ASCII art
-	font := "standard" // Default font
-
-	if len(args) == 2 {
-		font = args[1] // Optional: user-specified font
+	if len(args) > 1 {
+		// Too many arguments (banner selection is not supported in this version)
+		return "", fmt.Errorf("Usage: go run . [STRING]\nEX: go run . \"something\"")
 	}
 
-	return input, font, nil
+	input := args[0] // The input string to be converted
+	return input, nil
 }
